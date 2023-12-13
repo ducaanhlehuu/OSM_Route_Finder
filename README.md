@@ -4,7 +4,7 @@ applying 3 algorithm Astar,Dijkstra and GBFS
 ----------------------------------------------
 <h2>To run this file:</h2>
 <br>1. Clone this code:<br>
-<br><strong>    git clone: https://github.com/ducaanhlehuu/OSM_Route_Finder</strong>strong></br>
+<strong>    git clone: https://github.com/ducaanhlehuu/OSM_Route_Finder</strong>strong>
 <br>2. Change directory to project path</br>
 <br>3. Run FastApi:</br>
 <br> <strong>   uvicorn fastAPI:app --reload </strong>strong></br>
