@@ -1,13 +1,13 @@
 # OSM_Route_Finder
-Using Google Map Api to render and OSM to extract data and FastApi to build Api for find path.
-applying 3 algorithm Astar,Dijkstra and GBFS
-----------------------------------------------
+<h1>Using Google Map Api to render and OSM to extract data and FastApi to build Api for find path.
+applying 3 algorithm Astar,Dijkstra and GBFS</h1>
+
 <h2>To run this file:</h2>
 <br>1. Clone this code:<br>
-<strong>    git clone: https://github.com/ducaanhlehuu/OSM_Route_Finder</strong>strong>
+<strong>    git clone: https://github.com/ducaanhlehuu/OSM_Route_Finder</strong>
 <br>2. Change directory to project path</br>
 <br>3. Run FastApi:</br>
-<br> <strong>   uvicorn fastAPI:app --reload </strong>strong></br>
+<br> <strong>   uvicorn fastAPI:app --reload </strong></br>
 <br>4.Run index.html file in browser(please make sure you aren't using Add Blocks)</br>
 # References: 
   <br>Google Map AStar Path Finding: https://github.com/vraj152/googlemapsastar<br>
