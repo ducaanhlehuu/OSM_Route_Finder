@@ -1,0 +1,19 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    height: 95vh; 
+}
+.custom-alert {
+    position: fixed;
+    top: 50px;
+    right: 5%;
+    padding: 10px;
+    background-color: #e6f7ff; /* Màu xanh dương nhẹ */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+}
