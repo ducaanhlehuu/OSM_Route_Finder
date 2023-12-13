@@ -2,8 +2,9 @@
 <h3>Using Google Map Api to render and OSM to extract data and FastApi to build Api for find path.
 applying 3 algorithm Astar,Dijkstra and GBFS</h3>
 --------------------------------------------------
-<br></br>
+<br>
 <video>![Demo Video](OSM_Route_Finder/Demo.mp4)</video>
+</br>
 <h3>To run this file:</h3>
 <br>1. Clone this code:<br>
 <br><strong>    git clone: https://github.com/ducaanhlehuu/OSM_Route_Finder</strong></br>
