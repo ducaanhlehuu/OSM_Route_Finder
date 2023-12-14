@@ -12,7 +12,7 @@ https://github.com/ducaanhlehuu/OSM_Route_Finder/assets/119746108/d38150c0-34c6-
 <br>2. Change directory to project path</br>
 <br>3. Run FastApi:</br>
 <br> <strong>   uvicorn fastAPI:app --reload </strong></br>
-<br>4.Run index.html file in browser(please make sure you aren't using Add Blocks)</br>
+<br>4.Run index.html file in browser(please make sure you aren't using Ads Blocks)</br>
 
 # References: 
   <br>Google Map AStar Path Finding: https://github.com/vraj152/googlemapsastar<br>
