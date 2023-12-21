@@ -11,7 +11,7 @@ var polyline;
 let markers =[];
 var line1;
 var line2;
-
+var executeTimeMs;
 async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
     
@@ -20,13 +20,13 @@ async function initMap() {
         zoom: 18,
     })
     marker = new google.maps.Marker({
-        position: { lat: 21.0265264, lng: 105.8318917 }, 
+        position: { lat: 21.0273, lng: 105.8327 }, 
         title: 'Phuong Quoc Tu Giam',
         map:map,
     });
     
     const detailWindow = new google.maps.InfoWindow({
-        content: "<h3>Phường Quốc Tử Giám</h3>"
+        content: "<h3>Phường Quốc Tử Giám</h3><h5>21.0273° N, 105.8327° E</h5>"
     });
 
     marker.addListener("mouseover", () =>{
@@ -94,9 +94,14 @@ function setEndPoint() {
 
 function startFindingWay() {
     if (startPoint && endPoint) {
+        delete_Markers_and_polyline();
+        if (polyline && polyline.getMap()) {
+            // Xóa polyline khỏi bản đồ
+            polyline.setMap(null);
+        }
         // Tạo đối tượng dữ liệu để chứa thông tin điểm xuất phát và đích
         const apiUrl = `${SERVER_URL}/${selectedAlgorithm}?pntdata=${startPoint.lat()},${startPoint.lng()},${endPoint.lat()},${endPoint.lng()}`;
-        showAutoClosingAlert("Running.......",5000);
+        showAutoClosingAlert("Running.......",1000);
         // Gọi API sử dụng fetch
         fetch(apiUrl)
             .then(response => response.json())
@@ -104,10 +109,13 @@ function startFindingWay() {
                 // Xử lý kết quả từ API ở đây
                 console.log(result);
                 result_json = result;
-
+                
                 const pathCoordinates = result_json["path"].map(x => ({ lat: x[0], lng: x[1] }));
-                var executeTimeMs = (result_json["computation_time"] * 1000).toFixed(2);
-                showAutoClosingAlert("Execute time: " + executeTimeMs + "ms       \nPath length: " + result_json["cost"].toFixed(4) + " km         ",9000);
+                executeTimeMs = (result_json["computation_time"] * 1000).toFixed(2);
+                showAutoClosingAlert("Execute time: " + executeTimeMs + "ms       \nPath length: " + result_json["cost"].toFixed(4) + " km         \n"+"Number of nodes in route: "+result_json["path"].length+"\nNumber of nodes traversed on the map: "+ result_json["numbers_of_moved_nodes"],2000);
+                setTimeout(function() {
+                    alert("Path found!");
+                  }, 100);
                 polyline = new google.maps.Polyline({
                     path: pathCoordinates,
                     geodesic: true,
@@ -128,14 +136,14 @@ function startFindingWay() {
                     });
                     // Thêm sự kiện khi di chuột qua để hiển thị thông tin chi tiết
                     const detailWindow = new google.maps.InfoWindow({
-                        content: `<div>Point ${index + 1}</div>`,
+                        content: `<div>${coordinate.lat}° N, ${coordinate.lng}° E</div>`,
                     });
 
                     marker.addListener('mouseover', () => {
                         detailWindow.open(map, marker);
                     });
                     markers.push(marker);
-                });
+                                    });
                 line1 = new google.maps.Polyline({
                     path: [
                       { lat: startPoint.lat(), lng: startPoint.lng() },
@@ -225,5 +233,4 @@ function showAutoClosingAlert(message, timeout) {
       alertElement.style.display = 'none';
     }, timeout);
   }
-
 initMap()
