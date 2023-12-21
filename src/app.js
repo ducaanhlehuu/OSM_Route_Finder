@@ -16,11 +16,11 @@ async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
     
     map = new Map(document.getElementById("map"), {
-        center: { lat: 21.0273, lng: 105.8327 },
+        center: { lat: 21.02645, lng: 105.83165 },
         zoom: 18,
     })
     marker = new google.maps.Marker({
-        position: { lat: 21.0273, lng: 105.8327 }, 
+        position: { lat: 21.02645, lng: 105.83165 }, 
         title: 'Phuong Quoc Tu Giam',
         map:map,
     });
