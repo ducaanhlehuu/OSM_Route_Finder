@@ -1,10 +1,7 @@
-﻿from turtle import distance
 import networkx as nx
 import heapq
-import getfromgraph as gfg
 from geopy.distance import geodesic
 from math import sin, cos, sqrt, atan2, radians
-import searchNode as sN
 
 
 # Công thức haversine
@@ -45,6 +42,7 @@ def neighbors(G: nx.MultiDiGraph, nodeid: str, nodefinish: str):
 def GBFSearch(G: nx.MultiDiGraph, nodestart: str, nodefinish: str):
     priority_queue = [(heu_dist(G, nodestart, nodefinish), nodestart, [nodestart])]
     visited = set()
+    nodes_visited_count = 0
 
     while priority_queue:
         current_heuristic, current_node, current_path = heapq.heappop(priority_queue)
@@ -53,13 +51,19 @@ def GBFSearch(G: nx.MultiDiGraph, nodestart: str, nodefinish: str):
             continue
 
         visited.add(current_node)
+        nodes_visited_count += 1
 
         if current_node == nodefinish:
             list = []
             for nodeid in current_path:
-                x = sN.findLatLonByNodeid_2(nodeid, r"data\map.osm")
-                list.append(x)
-            return list
+                a = []
+                x = G.nodes[nodeid]["x"]
+                y = G.nodes[nodeid]["y"]
+                a.append(float(y))
+                a.append(float(x))
+                list.append(a)
+            return list, nodes_visited_count
+
         neighbors_list = neighbors(G, current_node, nodefinish)
 
         for neighbor in neighbors_list:
@@ -71,4 +75,4 @@ def GBFSearch(G: nx.MultiDiGraph, nodestart: str, nodefinish: str):
                 )
 
     # Trả về none nếu không tìm thấy
-    return None
+    return None, nodes_visited_count
