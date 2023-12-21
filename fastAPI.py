@@ -20,11 +20,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+doc = {}
+with open("data\QTGfull.graphml", "r", encoding="utf-8") as fd:
+    doc = xmltodict.parse(fd.read())
+
+path = "data\QTGfull.graphml"
+G = gfg.getgraph(path)
+
+file_path = "data\QTGfull.graphml"
+nodes, edges = load_graphml(file_path)
+
 
 class PathResponse(BaseModel):
     path: List[tuple]
     cost: float
     computation_time: float
+    numbers_of_moved_nodes: int
 
 
 class PointData(BaseModel):
@@ -40,8 +51,6 @@ def read_root():
 async def A_Star(pntdata: str):
     try:
         raw_input = pntdata.split(",")
-        file_path = "data\QTGfull.graphml"
-        nodes, edges = load_graphml(file_path)
         # Validate input format
         if len(raw_input) != 4:
             raise ValueError("Invalid input format")
@@ -49,16 +58,27 @@ async def A_Star(pntdata: str):
         input_source_loc = (float(raw_input[0]), float(raw_input[1]))
         input_dest_loc = (float(raw_input[2]), float(raw_input[3]))
 
-        mapped_source_loc = getKNN(input_source_loc)
-        mapped_dest_loc = getKNN(input_dest_loc)
-        source_node_id = getOSMId(mapped_source_loc[0], mapped_source_loc[1])
-        destination_node_id = getOSMId(mapped_dest_loc[0], mapped_dest_loc[1])
+        mapped_source_loc = getKNN(input_source_loc, doc)
+        mapped_dest_loc = getKNN(input_dest_loc, doc)
+        # source_node_id = findNearNodeid(input_source_loc[0], input_source_loc[1], G)
+        # destination_node_id = findNearNodeid(input_dest_loc[0], input_dest_loc[1], G)
+
+        source_node_id = getOSMId(mapped_source_loc[0], mapped_source_loc[1], doc)
+        destination_node_id = getOSMId(mapped_dest_loc[0], mapped_dest_loc[1], doc)
+
         s = timeit.default_timer()
-        final_path = astar(nodes, edges, source_node_id, destination_node_id)
-        cost = calculate_path_cost(edges, final_path)
+        final_path, moved_nodes = astar(
+            nodes, edges, source_node_id, destination_node_id
+        )
+        cost = calculate_path_cost(edges, final_path, doc)
         path_strings = [latlon for latlon in final_path]
         execute_time = timeit.default_timer() - s
-        return PathResponse(path=path_strings, cost=cost, computation_time=execute_time)
+        return PathResponse(
+            path=path_strings,
+            cost=cost,
+            computation_time=execute_time,
+            numbers_of_moved_nodes=moved_nodes,
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -71,22 +91,26 @@ async def Dijikstra(pntdata: str):
         # Validate input format
         if len(raw_input) != 4:
             raise ValueError("Invalid input format")
-        path = "data\QTGfull.graphml"
-        G = gfg.getgraph(path)
+
         input_source_loc = (float(raw_input[0]), float(raw_input[1]))
         input_dest_loc = (float(raw_input[2]), float(raw_input[3]))
 
-        mapped_source_loc = getKNN(input_source_loc)
-        mapped_dest_loc = getKNN(input_dest_loc)
-        source_node_id = getOSMId(mapped_source_loc[0], mapped_source_loc[1])
-        destination_node_id = getOSMId(mapped_dest_loc[0], mapped_dest_loc[1])
+        mapped_source_loc = getKNN(input_source_loc, doc)
+        mapped_dest_loc = getKNN(input_dest_loc, doc)
+        source_node_id = getOSMId(mapped_source_loc[0], mapped_source_loc[1], doc)
+        destination_node_id = getOSMId(mapped_dest_loc[0], mapped_dest_loc[1], doc)
 
         s = time.time()
-        final_path = DA.DSearch(G, source_node_id, destination_node_id)
-        cost = calculate_path_cost(edges, final_path)
+        final_path, moved_nodes = DA.DSearch(G, source_node_id, destination_node_id)
+        cost = calculate_path_cost(edges, final_path, doc)
         path_strings = [latlon for latlon in final_path]
         execute_time = time.time() - s
-        return PathResponse(path=path_strings, cost=cost, computation_time=execute_time)
+        return PathResponse(
+            path=path_strings,
+            cost=cost,
+            computation_time=execute_time,
+            numbers_of_moved_nodes=moved_nodes,
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -100,22 +124,25 @@ async def GBFS(pntdata: str):
         if len(raw_input) != 4:
             raise ValueError("Invalid input format")
 
-        path = "data\QTGfull.graphml"
-        G = gfg.getgraph(path)
         input_source_loc = (float(raw_input[0]), float(raw_input[1]))
         input_dest_loc = (float(raw_input[2]), float(raw_input[3]))
 
-        mapped_source_loc = getKNN(input_source_loc)
-        mapped_dest_loc = getKNN(input_dest_loc)
-        source_node_id = getOSMId(mapped_source_loc[0], mapped_source_loc[1])
-        destination_node_id = getOSMId(mapped_dest_loc[0], mapped_dest_loc[1])
+        mapped_source_loc = getKNN(input_source_loc, doc)
+        mapped_dest_loc = getKNN(input_dest_loc, doc)
+        source_node_id = getOSMId(mapped_source_loc[0], mapped_source_loc[1], doc)
+        destination_node_id = getOSMId(mapped_dest_loc[0], mapped_dest_loc[1], doc)
 
         s = time.time()
-        final_path = GA.GBFSearch(G, source_node_id, destination_node_id)
+        final_path, moved_nodes = GA.GBFSearch(G, source_node_id, destination_node_id)
+        cost = calculate_path_cost(edges, final_path, doc)
         path_strings = [latlon for latlon in final_path]
-        cost = calculate_path_cost(edges, final_path)
         execute_time = time.time() - s
-        return PathResponse(path=path_strings, cost=cost, computation_time=execute_time)
+        return PathResponse(
+            path=path_strings,
+            cost=cost,
+            computation_time=execute_time,
+            numbers_of_moved_nodes=moved_nodes,
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
