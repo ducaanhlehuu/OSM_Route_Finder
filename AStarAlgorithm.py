@@ -6,14 +6,10 @@ from searchNode import *
 from sklearn.neighbors import KDTree
 import numpy as np
 
-doc = {}
-with open("data\QTGfull.graphml", "r", encoding="utf-8") as fd:
-    doc = xmltodict.parse(fd.read())
-
 
 # def calculateHeuristic(curr, destination):
 #     return haversine(curr, destination)
-def getOSMId(lat, lon):
+def getOSMId(lat, lon, doc):
     OSMId = 0
     nodes = doc["graphml"]["graph"]["node"]
     for eachNode in range(len(nodes)):
@@ -63,14 +59,14 @@ def getOSMId(lat, lon):
 #     return neighbourId, neighbourHeuristic, neighbourCost, neighbourLatLon
 
 
-# def getLatLon(OSMId):
-#     lat, lon = 0, 0
-#     nodes = doc["graphml"]["graph"]["node"]
-#     for eachNode in range(len(nodes)):
-#         if nodes[eachNode]["@id"] == str(OSMId):
-#             lat = float(nodes[eachNode]["data"][0]["#text"])
-#             lon = float(nodes[eachNode]["data"][1]["#text"])
-#     return (lat, lon)
+def getLatLon(OSMId, doc):
+    lat, lon = 0, 0
+    nodes = doc["graphml"]["graph"]["node"]
+    for eachNode in range(len(nodes)):
+        if nodes[eachNode]["@id"] == str(OSMId):
+            lat = float(nodes[eachNode]["data"][0]["#text"])
+            lon = float(nodes[eachNode]["data"][1]["#text"])
+    return (lat, lon)
 
 
 # def aStar(sourceID, destinationID):
@@ -188,7 +184,7 @@ def getOSMId(lat, lon):
 # #     return path
 
 
-def getKNN(pointLocation):
+def getKNN(pointLocation, doc):
     nodes = doc["graphml"]["graph"]["node"]
     locations = []
     for eachNode in range(len(nodes)):
@@ -278,6 +274,7 @@ def astar(nodes, edges, source_id, destination_id):
     """Compute the A* path between source and destination."""
     priority_queue = [(0, source_id, [])]  # Add initial cost
     visited = set()
+    nodes_visited_count = 0
 
     while priority_queue:
         current_cost, current_node_id, current_path = heappop(priority_queue)
@@ -291,9 +288,13 @@ def astar(nodes, edges, source_id, destination_id):
         ]  # Store lat and lon
 
         if current_node_id == destination_id:
-            return current_path  # Return only the path
+            return (
+                current_path,
+                nodes_visited_count,
+            )  # Return both the path and nodes_visited_count
 
         visited.add(current_node_id)
+        nodes_visited_count += 1  # Increment the counter
 
         for neighbor_id, target_id, cost in edges:
             if neighbor_id == current_node_id:
@@ -302,20 +303,15 @@ def astar(nodes, edges, source_id, destination_id):
                 total_cost = current_cost + cost + heuristic
                 heappush(priority_queue, (total_cost, target_id, current_path))
 
-    return None  # Return None if no path is found
+    return None, nodes_visited_count  # Return None if no path is found
 
 
-# Example usage:
-file_path = "data\QTGfull.graphml"
-nodes, edges = load_graphml(file_path)
-
-
-def calculate_path_cost(edges, path):
+def calculate_path_cost(edges, path, doc):
     total_cost = 0
 
     for i in range(len(path) - 1):
-        source_node = getOSMId(path[i][0], path[i][1])
-        target_node = getOSMId(path[i + 1][0], path[i + 1][1])
+        source_node = getOSMId(path[i][0], path[i][1], doc)
+        target_node = getOSMId(path[i + 1][0], path[i + 1][1], doc)
 
         edge = next(
             (e for e in edges if (e[0] == source_node and e[1] == target_node)),
