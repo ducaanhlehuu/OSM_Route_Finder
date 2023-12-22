@@ -217,6 +217,7 @@ function set_find_node_algorithm(algo){
     }
 }
 function setAlgorithm(algorithm) {
+    selectedAlgorithm = algorithm;
     delete_Markers_and_polyline();
     if (polyline && polyline.getMap()) {
         // Xóa polyline khỏi bản đồ
