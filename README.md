@@ -3,7 +3,10 @@
 applying 3 algorithm Astar,Dijkstra and GBFS</h3>
 
 
-https://github.com/ducaanhlehuu/OSM_Route_Finder/assets/119746108/d38150c0-34c6-44b1-b11c-352011c0c64e
+
+https://github.com/ducaanhlehuu/OSM_Route_Finder/assets/119746108/cdd08e0b-becd-4064-abbb-b3b9c689afa8
+
+
 
 --------------------------------------------------
 <h3>To run this file:</h3>
