@@ -58,10 +58,10 @@ async def A_Star(pntdata: str):
         input_source_loc = (float(raw_input[0]), float(raw_input[1]))
         input_dest_loc = (float(raw_input[2]), float(raw_input[3]))
 
-        mapped_source_loc = getKNN(input_source_loc, doc)
-        mapped_dest_loc = getKNN(input_dest_loc, doc)
-        # source_node_id = findNearNodeid(input_source_loc[0], input_source_loc[1], G)
-        # destination_node_id = findNearNodeid(input_dest_loc[0], input_dest_loc[1], G)
+        # mapped_source_loc = getKNN(input_source_loc, doc)
+        # mapped_dest_loc = getKNN(input_dest_loc, doc)
+        mapped_source_loc = findNearNodeid(input_source_loc[0], input_source_loc[1], G)
+        mapped_dest_loc = findNearNodeid(input_dest_loc[0], input_dest_loc[1], G)
 
         source_node_id = getOSMId(mapped_source_loc[0], mapped_source_loc[1], doc)
         destination_node_id = getOSMId(mapped_dest_loc[0], mapped_dest_loc[1], doc)

@@ -1,6 +1,19 @@
 import xml.etree.ElementTree as ET
 import networkx as nx
 import math
+from math import sin, cos, sqrt, atan2, radians
+
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    # Chuyển đổi độ sang radian
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = 6371 * c
+
+    return distance
 
 
 def distance_from_point_to_line(x1, y1, x2, y2, x0, y0):
@@ -79,10 +92,23 @@ def findNearNodeid(lat, lon, G: nx.MultiDiGraph):
         x1, y1 = float(G.nodes[edge[0]]["x"]), float(G.nodes[edge[0]]["y"])
         x2, y2 = float(G.nodes[edge[1]]["x"]), float(G.nodes[edge[1]]["y"])
 
-        d = distance_from_point_to_line(x1, y1, x2, y2, lat, lon)
-
-        if d < min_distance and d != 0:
+        d1 = distance_from_point_to_line(x1, y1, x2, y2, lon, lat)
+        d2 = haversine_distance(x1, y1, x2, y2)
+        d3 = haversine_distance(x1, y1, lon, lat)
+        d4 = haversine_distance(x2, y2, lon, lat)
+        if pow(d4, 2) - pow(d1, 2) > pow(d2, 2) or pow(d3, 2) - pow(d1, 2) > pow(d2, 2):
+            d = min(d4, d3)
+        else:
+            d = d1
+        if d < min_distance:
             min_distance = d
             nearest_node = edge[1]
-
-    return nearest_node
+            print(d)
+            if min_distance == 0:
+                break
+    a = []
+    x = G.nodes[nearest_node]["x"]
+    y = G.nodes[nearest_node]["y"]
+    a.append(float(y))
+    a.append(float(x))
+    return a

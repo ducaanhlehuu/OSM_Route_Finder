@@ -94,6 +94,7 @@ function setEndPoint() {
 
 function startFindingWay() {
     if (startPoint && endPoint) {
+        google.maps.event.clearListeners(map, 'click');
         delete_Markers_and_polyline();
         if (polyline && polyline.getMap()) {
             // Xóa polyline khỏi bản đồ
