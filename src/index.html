@@ -17,9 +17,16 @@
           Choose Algorithm
         </button>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#" onclick="setAlgorithm('astar')">Astar</a></li>
-          <li><a class="dropdown-item" href="#" onclick="setAlgorithm('dijkstra')">Dijkstra</a></li>
-          <li><a class="dropdown-item" href="#" onclick="setAlgorithm('gbfs')">GBFS</a></li>
+          <li><a class="dropdown-item" onclick="setAlgorithm('Astar')">Astar</a></li>
+          <li><a class="dropdown-item" onclick="setAlgorithm('Dijkstradijkstra')">Dijkstra</a></li>
+          <li><a class="dropdown-item" onclick="setAlgorithm('GBFS')">GBFS</a></li>
+        </ul>
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Near Node
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" onclick="set_find_node_algorithm('getKNN')">K Nearest Neighbours</a></li>
+          <li><a class="dropdown-item" onclick="setAlgorithm('near_edge_node')">Find Nearest Edge Node</a></li>
         </ul>
         <button type="button" class="btn btn-success" onclick="setStartPoint()" >Start Point</button>
         <button type="button" class="btn btn-danger" onclick="setEndPoint()">End Point</button>

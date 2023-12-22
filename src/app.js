@@ -5,26 +5,43 @@ var start_marker;
 var end_marker;
 var startPoint = null;
 var endPoint = null;
-var selectedAlgorithm='astar';
+var selectedAlgorithm='Astar';
 var result_json;
 var polyline;
 let markers =[];
 var line1;
 var line2;
 var executeTimeMs;
+var near_node_algo = "getKNN";
 async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
     
     map = new Map(document.getElementById("map"), {
-        center: { lat: 21.02645, lng: 105.83165 },
+        center: { lat: 21.0264, lng: 105.8327 },
         zoom: 18,
     })
     marker = new google.maps.Marker({
-        position: { lat: 21.02645, lng: 105.83165 }, 
+        position: { lat: 21.0264, lng: 105.8327 }, 
         title: 'Phuong Quoc Tu Giam',
         map:map,
     });
-    
+    var boundaryPoints = [
+        {lat: 21.0311, lng: 105.8405},
+        {lat: 21.0311, lng: 105.8250},
+        {lat: 21.0217, lng: 105.8250},
+        {lat: 21.0217, lng: 105.8405},
+        {lat: 21.0311, lng: 105.8405},
+    ];
+
+    // Create a polyline to represent the boundary line
+    var boundaryLine = new google.maps.Polyline({
+        path: boundaryPoints,
+        geodesic: true,
+        strokeColor: '#FF0000', // Color of the line
+        strokeOpacity: 1.0,
+        strokeWeight: 2, // Thickness of the line
+        map: map
+    });
     const detailWindow = new google.maps.InfoWindow({
         content: "<h3>Phường Quốc Tử Giám</h3><h5>21.0273° N, 105.8327° E</h5>"
     });
@@ -101,7 +118,7 @@ function startFindingWay() {
             polyline.setMap(null);
         }
         // Tạo đối tượng dữ liệu để chứa thông tin điểm xuất phát và đích
-        const apiUrl = `${SERVER_URL}/${selectedAlgorithm}?pntdata=${startPoint.lat()},${startPoint.lng()},${endPoint.lat()},${endPoint.lng()}`;
+        const apiUrl = `${SERVER_URL}/finding_path?pntdata=${startPoint.lat()},${startPoint.lng()},${endPoint.lat()},${endPoint.lng()}&path_find_algo=${selectedAlgorithm}&near_node_algo=${near_node_algo}`;
         showAutoClosingAlert("Running.......",1000);
         // Gọi API sử dụng fetch
         fetch(apiUrl)
@@ -176,9 +193,30 @@ function startFindingWay() {
         alert("Please set both start and end points before finding the way.");
     }
 }
+function set_find_node_algorithm(algo){
+    near_node_algo = algo;
+    delete_Markers_and_polyline();
+    if (polyline && polyline.getMap()) {
+        // Xóa polyline khỏi bản đồ
+        polyline.setMap(null);
+    }
+    // Remove 'active' class from all dropdown items
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach(item => item.classList.remove('active'));
 
+    // Add 'active' class to the selected item
+    const selectedItem = document.querySelector(`.dropdown-item[href="#"][onclick="set_find_node_algorithm('${algo}')"]`);
+    if (selectedItem) {
+        selectedItem.classList.add('active');
+    }
+    if (near_node_algo == "getKNN"){
+        showAutoClosingAlert(`Selected find near node algorithm: K Nearest Neighbours`,5000);
+    }
+    else {
+        showAutoClosingAlert(`Selected find near node algorithm: Find Nearest Edge Node`,5000);
+    }
+}
 function setAlgorithm(algorithm) {
-    selectedAlgorithm = algorithm;
     delete_Markers_and_polyline();
     if (polyline && polyline.getMap()) {
         // Xóa polyline khỏi bản đồ
@@ -193,7 +231,7 @@ function setAlgorithm(algorithm) {
     if (selectedItem) {
         selectedItem.classList.add('active');
     }
-    showAutoClosingAlert(`Selected algorithm: ${algorithm}`,3000);
+    showAutoClosingAlert(`Selected path finding algorithm: ${algorithm}`,5000);
 }
 function setMapOnAll(map) {
     for (let i = 0; i < markers.length; i++) {

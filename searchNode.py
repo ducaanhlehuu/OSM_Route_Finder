@@ -6,13 +6,7 @@ from math import sin, cos, sqrt, atan2, radians
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     # Chuyển đổi độ sang radian
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    distance = 6371 * c
-
+    distance = sqrt(pow(lat2 - lat1, 2) + pow(lon2 - lon1, 2))
     return distance
 
 
@@ -84,7 +78,7 @@ def findLatLonByNodeid(nodeid: str, file_path: str):
     return 0
 
 
-def findNearNodeid(lat, lon, G: nx.MultiDiGraph):
+def findNearNodeidForstart(lat, lon, G: nx.MultiDiGraph):
     min_distance = float("inf")
     nearest_node = None
 
@@ -96,14 +90,45 @@ def findNearNodeid(lat, lon, G: nx.MultiDiGraph):
         d2 = haversine_distance(x1, y1, x2, y2)
         d3 = haversine_distance(x1, y1, lon, lat)
         d4 = haversine_distance(x2, y2, lon, lat)
-        if pow(d4, 2) - pow(d1, 2) > pow(d2, 2) or pow(d3, 2) - pow(d1, 2) > pow(d2, 2):
+        if (pow(d4, 2) - pow(d1, 2)) > pow(d2, 2) or (pow(d3, 2) - pow(d1, 2)) > pow(
+            d2, 2
+        ):
             d = min(d4, d3)
         else:
             d = d1
         if d < min_distance:
             min_distance = d
             nearest_node = edge[1]
-            print(d)
+            if min_distance == 0:
+                break
+    a = []
+    x = G.nodes[nearest_node]["x"]
+    y = G.nodes[nearest_node]["y"]
+    a.append(float(y))
+    a.append(float(x))
+    return a
+
+
+def findNearNodeidForfinish(lat, lon, G: nx.MultiDiGraph):
+    min_distance = float("inf")
+    nearest_node = None
+
+    for edge in G.edges:
+        x1, y1 = float(G.nodes[edge[0]]["x"]), float(G.nodes[edge[0]]["y"])
+        x2, y2 = float(G.nodes[edge[1]]["x"]), float(G.nodes[edge[1]]["y"])
+        d1 = distance_from_point_to_line(x1, y1, x2, y2, lon, lat)
+        d2 = haversine_distance(x1, y1, x2, y2)
+        d3 = haversine_distance(x1, y1, lon, lat)
+        d4 = haversine_distance(x2, y2, lon, lat)
+        if (pow(d4, 2) - pow(d1, 2)) > pow(d2, 2) or (pow(d3, 2) - pow(d1, 2)) > pow(
+            d2, 2
+        ):
+            d = min(d4, d3)
+        else:
+            d = d1
+        if d < min_distance:
+            min_distance = d
+            nearest_node = edge[0]
             if min_distance == 0:
                 break
     a = []
